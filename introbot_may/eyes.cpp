@@ -1,3 +1,4 @@
+/*
 #include "eyes.h"
 
 double Eyes::diff() {
@@ -5,15 +6,6 @@ double Eyes::diff() {
 }
 
 double Eyes::read_eye(int iopin) {
-  double reading = .0;
-  
-  // read 4 times to get a stable reading
-  for (int i = 0; i < 4; i++) {
-    reading += analogRead(iopin);
-    delay(5);
-  }
-
-  return (reading / 4.0);
 }
 
 double Eyes::read_left() {   
@@ -44,4 +36,5 @@ void Eyes::debug() {
   Serial.print( mavgr->var() );
   Serial.print( "," );
 }
+*/
 

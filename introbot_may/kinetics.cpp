@@ -157,6 +157,11 @@ void Kinetics::update() {
   // left
   digitalWrite(MOTOR_LEFT_DIRECTION, ml.dir);  
   analogWrite(MOTOR_LEFT_SPEED, ml.speed);
+
+  // if lastaction is completed, stop
+  if(lastaction.check()) {
+    stop();
+  }
 }
 
 
@@ -209,6 +214,42 @@ Kinetics::levels Kinetics::getPWM(float linear_x, float linear_y, float angular_
 
   return pwm;
 }
+
+int Kinetics::mappedPwmValue(int reading, int vmin, int vmax) {
+  int val;
+
+  val = map(reading, vmin, vmax, 0, 1023);
+  val = val / 4;
+
+  return constrain(val, 0, 255);
+}
+
+void Kinetics::steer_with_light(Eyes &eyes) {
+  ml.speed = mappedPwmValue(eyes.left().reading, eyes.left().vmin, eyes.left().vmax);
+  mr.speed = mappedPwmValue(eyes.right().reading, eyes.right().vmin, eyes.right().vmax);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
 Kinetics::velocities Kinetics::getVelocities(int motor1, int motor2)

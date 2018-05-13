@@ -4,6 +4,7 @@
 #include <Chrono.h>
 #include <Metro.h>
 
+#include "eyes.h"
 #include "config.h"
 
 // measurements of or 2WD bot
@@ -72,6 +73,8 @@ class Kinetics {
     void smooth_left(int time);
     void demo_loop();
 
+    void steer_with_light(Eyes &eyes);
+
 //    velocities getVelocities(int motor1, int motor2);
 //    velocities getVelocities(int motor1, int motor2, int motor3, int motor4);
     levels getRPM(float linear_x, float linear_y, float angular_z);
@@ -79,6 +82,8 @@ class Kinetics {
     int rpmToPWM(int rpm);
 
     bool isMoving() { return ((ml.speed > 0) && (mr.speed > 0)); }
+
+    int mappedPwmValue(int reading, int vmin, int vmax);
 
 private:
 
