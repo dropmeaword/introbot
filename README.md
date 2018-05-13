@@ -1,3 +1,8 @@
+You will need the Metro and Corestats libraries in your Arduino environment.
+
+https://github.com/thomasfredericks/Metro-Arduino-Wiring
+https://github.com/dropmeaword/corestats.git
+
 #### introbot_april_playtest_version
 
 This is the version that was used in the user-experiment session that took place in April.
