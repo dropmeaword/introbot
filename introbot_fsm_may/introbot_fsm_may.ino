@@ -124,7 +124,7 @@ void setup() {
 
   kinetics.init();
   
-  fsm.add_timed_transition(&calibrating, &demo, 25000, NULL);
+  fsm.add_timed_transition(&calibrating, &demo, 5000, NULL);
   fsm.add_timed_transition(&demo, &sleeping, 25000, NULL);
   fsm.add_transition(&sleeping, &stressed, EVENT_GOT_SCARED, &on_trans_leeping_to_stressed);
   fsm.add_transition(&stressed, &sleeping, EVENT_GOT_SLEEPY, NULL);
@@ -132,16 +132,16 @@ void setup() {
 
 
 void event_loop() {
-  eyes.read_eyes();
-  eyes.debug();
-
-  Serial.print(", ");
-  Serial.println(threshold);
+  kinetics.update();
+//  eyes.read_eyes();
+//  eyes.debug();
+//
+//  Serial.print(", ");
+//  Serial.println(threshold);
 }
 
 void loop() {
   event_loop();
   fsm.run_machine();
-  delay(5);
 }
 

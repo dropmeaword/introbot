@@ -59,6 +59,7 @@ void Kinetics::go(int val){
 }
 
 void Kinetics::stop() {
+  Serial.println("kinetics::stop");
   ml.speed = 0;
   mr.speed = 0;
 }
@@ -132,18 +133,14 @@ void Kinetics::demo_loop() {
   boolean forward = (millis() % 5000) < 2500;
 
   if (wheel1) {
-    Serial.print("WHEEL A: ");
-    analogWrite(CHA_PWM, 255);
-    analogWrite(CHB_PWM, 0);
-    Serial.println(forward ? "FORWARD" : "BACKWARD");
-    digitalWrite(CHA_DIR, forward ? HIGH : LOW);
+    Serial.println("turn left");
+    turn_left(360);
   } else {
-    Serial.print("WHEEL B: ");
-    analogWrite(CHA_PWM, 0);
-    analogWrite(CHB_PWM, 255);
-    Serial.println(forward ? "FORWARD" : "BACKWARD");
-    digitalWrite(CHB_DIR, forward ? HIGH : LOW);
+    Serial.println("turn right");
+    turn_right(360);
   }
+
+  update();
 }
 
 void Kinetics::update() {
