@@ -69,7 +69,8 @@ class Eyes {
     Eye &right() { return (Eye &)right_; }
     
     double diff() { return ( (left_->reading * left_->WEIGH) - (right_->reading * right_->WEIGH) ); }
-    
+    double absdiff() { abs(diff()); } 
+   
     double read() {
       left_->read();
       right_->read();

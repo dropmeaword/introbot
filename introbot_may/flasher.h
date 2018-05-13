@@ -6,6 +6,10 @@
 class Flasher
 {
   int ledPin;      // the number of the LED pin
+
+  int *iopins;
+  int ledCount;
+  
   long OnTime;     // milliseconds of on-time
   long OffTime;    // milliseconds of off-time
 
@@ -21,14 +25,36 @@ class Flasher
   
   public:
 
+  Flasher(int *pins, int count, float freq) {
+    iopins = new int[count];
+
+    // copy pin numbers
+    for(int i = 0; i < count; i++) {
+      iopins[i] = pins[i];
+    }
+    
+    init(freq);
+  }
+
   Flasher(int pin, float freq)
   {
-    ledPin = pin;
-    pinMode(ledPin, OUTPUT);     
+    iopins = new int[1];
+    iopins[0] = pin;
+    ledCount = 1;
+
+    init(freq);
+  }
+
+  ~Flasher() {
+    delete []iopins;
+  }
+
+
+  void init(float freq) {
+    for(int i = 0; i < ledCount; i++) {
+      pinMode(iopins[i], OUTPUT);
+    }
       
-//    OnTime = on;
-//    OffTime = off;
-    
     ledState = LOW; 
     previousMillis = 0;
 
@@ -38,14 +64,16 @@ class Flasher
   }
 
   void flash(int howlong = 1000) {
-      flashing = true;
-      flashingStarted = millis();
-      flashingTime = howlong;
+    flashing = true;
+    flashingStarted = millis();
+    flashingTime = howlong;
   }
 
   void stop() {
-      flashing = false;
-      digitalWrite(ledPin, LOW);
+    flashing = false;
+    for(int i = 0; i < ledCount; i++) {
+      digitalWrite(iopins[i], LOW);
+    }
   }
 
   void debug(){
@@ -91,13 +119,10 @@ class Flasher
     level = smooth();
 
     if(flashing) {
-        analogWrite(ledPin, level);
+      for(int i = 0; i < ledCount; i++) {
+        analogWrite(iopins[i], level);
+      }
     }
-
-//    if(flashing && (millis() - flashingStarted) >= flashingTime ) {
-//        stop();
-//    }
-    
   } // update ()
 
 }; // class
