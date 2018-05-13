@@ -6,7 +6,8 @@
 #include "eyes.h"
 #include "shaker.h"
 
-int pinLEDS[3] = {10, 5, 6};
+#define LED_COUNT 3
+int pinLEDS[LED_COUNT] = {10, 5, 6};
 
 #define EVENT_GOT_HAPPY    1000
 #define EVENT_GOT_STRESSED 1100
@@ -19,9 +20,9 @@ Kinetics kinetics;
 
 int threshold = 8;
 
-Flasher superfast(pinLEDS, 3, 0.4);
-Flasher slow(pinLEDS, 3, 0.009);
-Flasher fast(pinLEDS, 3, 0.06);
+Flasher superfast(pinLEDS, LED_COUNT, 0.4);
+Flasher slow(pinLEDS, LED_COUNT, 0.009);
+Flasher fast(pinLEDS, LED_COUNT, 0.06);
 
 // 0.009 nice and smooth
 // 0.08 fast hearbeat
