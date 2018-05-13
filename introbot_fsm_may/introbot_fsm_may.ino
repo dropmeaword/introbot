@@ -1,8 +1,13 @@
 #include <Metro.h>
 
-#include "corestats.h"
+//#include "corestats.h"
+
 #include "Fsm.h"
 #include "flasher.h"
+#include "config.h"
+
+#include "kinetics.h"
+#include "eyes.h"
 
 #define LED_PIN 10
 
@@ -10,9 +15,13 @@
 #define EVENT_GOT_SCARED 1000
 #define EVENT_GOT_SLEEPY 1001
 
+
+Eyes eyes(LDR_LEFT, LDR_RIGHT);
+Kinetics kinetics;
+
 int threshold = 8;
 
-AdaptiveNormalizer mavg(0,1);
+//AdaptiveNormalizer mavg(0,1);
 
 Flasher superfast(LED_PIN, 0.4);
 Flasher slow(LED_PIN, 0.009);
@@ -24,6 +33,7 @@ Flasher fast(LED_PIN, 0.06);
 
 Metro calmdown(5000);
 
+// ON CALIBRATING
 void on_calibrating_enter() {
   Serial.println("on_calibrating_enter");
   superfast.flash();
@@ -41,6 +51,23 @@ void on_calibrating_loop() {
 State calibrating("calibrating", &on_calibrating_enter, &on_calibrating_loop, &on_calibrating_leave);
 Fsm fsm(&calibrating);
 
+// ON DEMO
+void on_demo_enter() {
+  Serial.println("on_demo_enter");
+}
+
+void on_demo_leave() {
+  Serial.println("on_demo_leave");
+  kinetics.stop();
+}
+
+void on_demo_loop() {
+  kinetics.demo_loop();
+}
+
+State demo("demo", &on_demo_enter, &on_demo_loop, &on_demo_leave);
+
+// ON SLEEPING
 void on_sleeping_enter() {
   Serial.println("on_sleeping_enter");
   slow.flash();
@@ -53,9 +80,9 @@ void on_sleeping_leave() {
 
 void on_sleeping_loop() {
   slow.update();
-  if(mavg.get() > threshold) {
-      fsm.trigger(EVENT_GOT_SCARED);
-  }
+//  if(mavg.get() > threshold) {
+//      fsm.trigger(EVENT_GOT_SCARED);
+//  }
 }
 
 State sleeping("sleeping", &on_sleeping_enter, &on_sleeping_loop, &on_sleeping_leave);
@@ -74,9 +101,9 @@ void on_stressed_loop() {
 //  Serial.println("on_stressed_loop");
   fast.update();
 
-  if(mavg.get() > threshold) {
-    calmdown.reset();
-  }
+//  if(mavg.get() > threshold) {
+//    calmdown.reset();
+//  }
 
   if(calmdown.check()) {
       fsm.trigger(EVENT_GOT_SLEEPY);
@@ -95,28 +122,21 @@ void setup() {
   Serial.begin(115200);
   pinMode(LED_PIN, OUTPUT);
 
-  fsm.add_timed_transition(&calibrating, &sleeping, 25000, NULL);
+  kinetics.init();
+  
+  fsm.add_timed_transition(&calibrating, &demo, 25000, NULL);
+  fsm.add_timed_transition(&demo, &sleeping, 25000, NULL);
   fsm.add_transition(&sleeping, &stressed, EVENT_GOT_SCARED, &on_trans_leeping_to_stressed);
   fsm.add_transition(&stressed, &sleeping, EVENT_GOT_SLEEPY, NULL);
 }
 
 
 void event_loop() {
-  // read analog sensor for interaction
-  double reading = 0;
-  for(int i = 0; i < 4; i++) {
-    reading += analogRead(A0);
-  }
-  reading = reading / 4.0;
+  eyes.read_eyes();
+  eyes.debug();
 
-  mavg.put( reading );
-
-//  slow.debug();
-  Serial.print(threshold);
   Serial.print(", ");
-  Serial.print(mavg.var());
-  Serial.print(", ");
-  Serial.println(mavg.get());
+  Serial.println(threshold);
 }
 
 void loop() {

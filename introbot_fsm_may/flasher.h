@@ -1,3 +1,6 @@
+#ifndef __FLASHER_H__
+#define __FLASHER_H__
+
 #include <Arduino.h>
 
 class Flasher
@@ -99,3 +102,4 @@ class Flasher
 
 }; // class
 
+#endif // __FLASHER_H__
