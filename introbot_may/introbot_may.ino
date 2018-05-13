@@ -1,8 +1,4 @@
-//#include <Metro.h>
-
-//#include "corestats.h"
-
-#include "Fsm.h"
+#include "statemachine.h"
 #include "flasher.h"
 #include "config.h"
 
@@ -22,8 +18,6 @@ Shaker shaker(PIN_SHAKER);
 Kinetics kinetics;
 
 int threshold = 8;
-
-//AdaptiveNormalizer mavg(0,1);
 
 Flasher superfast(LED_PIN, 0.4);
 Flasher slow(LED_PIN, 0.009);
