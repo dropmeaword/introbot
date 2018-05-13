@@ -1,7 +1,9 @@
 #ifndef __KINETICS_H__
 #define __KINETICS_H__
 
+#include <Chrono.h>
 #include <Metro.h>
+
 #include "config.h"
 
 // measurements of or 2WD bot
@@ -18,16 +20,14 @@
 #define SPEED_MEDIUM 100
 #define SPEED_FAST 150
 
+#define BACK LOW
+#define FORTH HIGH
+
 class Kinetics {
   public:
 
-    enum Direction {
-      BACK  = LOW,
-      FORTH = HIGH
-    };
-    
     struct motor {
-      Direction dir;
+      int dir;
       int speed;
     };
     
@@ -78,7 +78,13 @@ class Kinetics {
     levels getPWM(float linear_x, float linear_y, float angular_z);
     int rpmToPWM(int rpm);
 
+    bool isMoving() { return ((ml.speed > 0) && (mr.speed > 0)); }
+
 private:
+
+    Chrono demotimer;
+    Metro lastaction;
+
     float linear_vel_x_mins_;
     float linear_vel_y_mins_;
     float angular_vel_z_mins_;
@@ -91,8 +97,6 @@ private:
     double wheel_diameter_;
     float base_width_;
     double pwm_res_;
-
-    Metro action;
 };
 
 #endif

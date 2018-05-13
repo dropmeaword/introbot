@@ -1,4 +1,4 @@
-#include <Metro.h>
+//#include <Metro.h>
 
 //#include "corestats.h"
 
@@ -8,6 +8,7 @@
 
 #include "kinetics.h"
 #include "eyes.h"
+#include "shaker.h"
 
 #define LED_PIN 10
 
@@ -17,6 +18,7 @@
 
 
 Eyes eyes(LDR_LEFT, LDR_RIGHT);
+Shaker shaker(PIN_SHAKER);
 Kinetics kinetics;
 
 int threshold = 8;
@@ -31,7 +33,7 @@ Flasher fast(LED_PIN, 0.06);
 // 0.08 fast hearbeat
 // 0.4 fast flashing
 
-Metro calmdown(5000);
+Chrono calmdown;
 
 // ON CALIBRATING
 void on_calibrating_enter() {
@@ -54,15 +56,18 @@ Fsm fsm(&calibrating);
 // ON DEMO
 void on_demo_enter() {
   Serial.println("on_demo_enter");
+  shaker.on(5000);
 }
 
 void on_demo_leave() {
   Serial.println("on_demo_leave");
   kinetics.stop();
+  shaker.off();
 }
 
 void on_demo_loop() {
   kinetics.demo_loop();
+  shaker.update();
 }
 
 State demo("demo", &on_demo_enter, &on_demo_loop, &on_demo_leave);
@@ -102,10 +107,10 @@ void on_stressed_loop() {
   fast.update();
 
 //  if(mavg.get() > threshold) {
-//    calmdown.reset();
+//    calmdown.restart();
 //  }
 
-  if(calmdown.check()) {
+  if(calmdown.hasPassed(5000)) {
       fsm.trigger(EVENT_GOT_SLEEPY);
   }
 }

@@ -35,22 +35,22 @@ void Kinetics::init() {
   base_width_ = mmWheelDistance;
   pwm_res_ = pow(2, 8) - 1;
   
-  ml.dir = Direction::FORTH;
+  ml.dir = FORTH;
   ml.speed = 0;
-  mr.dir = Direction::FORTH;
+  mr.dir = FORTH;
   mr.speed = 0;
 
   Serial.println( "initializing motors" );
 }
 
 void Kinetics::go_forward() {
-  ml.dir = Direction::FORTH;
-  mr.dir = Direction::FORTH;
+  ml.dir = FORTH;
+  mr.dir = FORTH;
 }
 
 void Kinetics::go_back() {
-  ml.dir = Direction::BACK;
-  mr.dir = Direction::BACK;
+  ml.dir = BACK;
+  mr.dir = BACK;
 }
  
 void Kinetics::go(int val){
@@ -65,13 +65,13 @@ void Kinetics::stop() {
 }
 
 void Kinetics::turn_left(int degrees) {
-  ml.dir = Direction::BACK;
+  ml.dir = BACK;
   ml.speed = 150;
-  mr.dir = Direction::FORTH;
+  mr.dir = FORTH;
   mr.speed = 255;
   
-  action.interval(degrees * 4);
-  action.reset();  
+  lastaction.interval(degrees * 4);
+  lastaction.reset();
 
 //  analogWrite(MOTOR_RIGHT_SPEED,255);   
 //  digitalWrite(MOTOR_LEFT_DIRECTION, LOW);  
@@ -82,13 +82,14 @@ void Kinetics::turn_left(int degrees) {
 }
 
 void Kinetics::turn_right(int degrees){
-  ml.dir = Direction::FORTH;
+  ml.dir = FORTH;
   ml.speed = 255;
-  mr.dir = Direction::BACK;
+  mr.dir = BACK;
   mr.speed = 150;
-  
-  action.interval(degrees * 4);
-  action.reset();  
+
+  lastaction.interval(degrees * 4);
+  lastaction.reset();
+
 //  analogWrite(MOTOR_LEFT_SPEED,255);   
 //  digitalWrite(MOTOR_RIGHT_DIRECTION, LOW);  
 //  analogWrite(MOTOR_RIGHT_SPEED, 150);
@@ -98,13 +99,13 @@ void Kinetics::turn_right(int degrees){
 }
 
 void Kinetics::smooth_right(int time){
-  ml.dir = Direction::FORTH;
+  ml.dir = FORTH;
   ml.speed = 255;
-  mr.dir = Direction::FORTH;
+  mr.dir = FORTH;
   mr.speed = 150;
   
-  action.interval(time * 5);
-  action.reset();  
+  lastaction.interval(time * 5);
+  lastaction.reset();  
 //  go_forward();
 //  analogWrite(MOTOR_LEFT_SPEED,255);   
 //  analogWrite(MOTOR_RIGHT_SPEED, 150);
@@ -113,13 +114,13 @@ void Kinetics::smooth_right(int time){
 //  go_forward();
 }
 void Kinetics::smooth_left(int time){
-  ml.dir = Direction::FORTH;
+  ml.dir = FORTH;
   ml.speed = 150;
-  mr.dir = Direction::FORTH;
+  mr.dir = FORTH;
   mr.speed = 255;
   
-  action.interval(time * 5);
-  action.reset();  
+  lastaction.interval(time * 5);
+  lastaction.reset();  
 //  go_forward();
 //  analogWrite(MOTOR_RIGHT_SPEED,255);   
 //  analogWrite(MOTOR_LEFT_SPEED, 150);
@@ -129,15 +130,21 @@ void Kinetics::smooth_left(int time){
 }
 
 void Kinetics::demo_loop() {
-  boolean wheel1 = (millis() % 10000) < 5000;
-  boolean forward = (millis() % 5000) < 2500;
-
-  if (wheel1) {
+  
+  if(demotimer.hasPassed(100)) {
     Serial.println("turn left");
     turn_left(360);
-  } else {
+  } else if(demotimer.hasPassed(5000)) {
     Serial.println("turn right");
     turn_right(360);
+  } else if(demotimer.hasPassed(10000)) {
+    Serial.println("smooth right");
+    smooth_right(60);
+  } else if(demotimer.hasPassed(15000)) {
+    Serial.println("smooth left");
+    smooth_left(60);
+  } else if(demotimer.hasPassed(20000)) {
+    demotimer.restart();
   }
 
   update();

@@ -1,6 +1,7 @@
-You will need the Metro and Corestats libraries in your Arduino environment.
+You will need the Chrono, Metro and corestats libraries in your Arduino environment.
 
-https://github.com/thomasfredericks/Metro-Arduino-Wiring
+https://github.com/SofaPirate/Chrono.git
+https://github.com/thomasfredericks/Metro-Arduino-Wiring.git
 https://github.com/dropmeaword/corestats.git
 
 #### introbot_april_playtest_version

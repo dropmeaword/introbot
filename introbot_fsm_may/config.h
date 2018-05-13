@@ -16,5 +16,8 @@
 #define CHA_BRK 9
 #define CHA_SNS A0
 
+// vibromotor
+#define PIN_SHAKER 2
+
 
 #endif
