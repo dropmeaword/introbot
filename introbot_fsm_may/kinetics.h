@@ -1,6 +1,7 @@
 #ifndef __KINETICS_H__
 #define __KINETICS_H__
 
+#include <Metro.h>
 #include "config.h"
 
 // measurements of or 2WD bot
@@ -20,6 +21,16 @@
 class Kinetics {
   public:
 
+    enum Direction {
+      BACK  = LOW,
+      FORTH = HIGH
+    };
+    
+    struct motor {
+      Direction dir;
+      int speed;
+    };
+    
     struct levels {
       int motor1;
       int motor2;
@@ -30,7 +41,9 @@ class Kinetics {
       float linear_y;
       float angular_z;
     };
-    
+
+    motor ml, mr; // motors left and right
+     
     float speed;
 
     float mmWheelRadius;
@@ -78,6 +91,8 @@ private:
     double wheel_diameter_;
     float base_width_;
     double pwm_res_;
+
+    Metro action;
 };
 
 #endif

@@ -34,63 +34,97 @@ void Kinetics::init() {
   max_rpm_ = MOTOR_MAX_RPM;
   base_width_ = mmWheelDistance;
   pwm_res_ = pow(2, 8) - 1;
+  
+  ml.dir = Direction::FORTH;
+  ml.speed = 0;
+  mr.dir = Direction::FORTH;
+  mr.speed = 0;
 
   Serial.println( "initializing motors" );
 }
 
 void Kinetics::go_forward() {
-  digitalWrite(MOTOR_RIGHT_DIRECTION,HIGH);   
-  digitalWrite(MOTOR_LEFT_DIRECTION, HIGH);  
+  ml.dir = Direction::FORTH;
+  mr.dir = Direction::FORTH;
 }
 
 void Kinetics::go_back() {
-  digitalWrite(MOTOR_RIGHT_DIRECTION,LOW);   
-  digitalWrite(MOTOR_LEFT_DIRECTION, LOW);       
+  ml.dir = Direction::BACK;
+  mr.dir = Direction::BACK;
 }
  
-void Kinetics::go(int speedValue){
-  analogWrite(MOTOR_RIGHT_SPEED,speedValue);   
-  analogWrite(MOTOR_LEFT_SPEED, speedValue);
+void Kinetics::go(int val){
+  ml.speed = val;
+  mr.speed = val;
 }
 
 void Kinetics::stop() {
-  analogWrite(MOTOR_RIGHT_SPEED,0);   
-  analogWrite(MOTOR_LEFT_SPEED, 0);   
+  ml.speed = 0;
+  mr.speed = 0;
 }
 
 void Kinetics::turn_left(int degrees) {
-  analogWrite(MOTOR_RIGHT_SPEED,255);   
-  digitalWrite(MOTOR_LEFT_DIRECTION, LOW);  
-  analogWrite(MOTOR_LEFT_SPEED, 150);
-  delay(degrees*4); 
-  go(DEFAULT_SPEED);
-  go_forward();
+  ml.dir = Direction::BACK;
+  ml.speed = 150;
+  mr.dir = Direction::FORTH;
+  mr.speed = 255;
+  
+  action.interval(degrees * 4);
+  action.reset();  
+
+//  analogWrite(MOTOR_RIGHT_SPEED,255);   
+//  digitalWrite(MOTOR_LEFT_DIRECTION, LOW);  
+//  analogWrite(MOTOR_LEFT_SPEED, 150);
+//  delay(degrees*4); 
+//  go(DEFAULT_SPEED);
+//  go_forward();
 }
 
 void Kinetics::turn_right(int degrees){
-  analogWrite(MOTOR_LEFT_SPEED,255);   
-  digitalWrite(MOTOR_RIGHT_DIRECTION, LOW);  
-  analogWrite(MOTOR_RIGHT_SPEED, 150);
-  delay(degrees*4); 
-  go(DEFAULT_SPEED);
-  go_forward();
+  ml.dir = Direction::FORTH;
+  ml.speed = 255;
+  mr.dir = Direction::BACK;
+  mr.speed = 150;
+  
+  action.interval(degrees * 4);
+  action.reset();  
+//  analogWrite(MOTOR_LEFT_SPEED,255);   
+//  digitalWrite(MOTOR_RIGHT_DIRECTION, LOW);  
+//  analogWrite(MOTOR_RIGHT_SPEED, 150);
+//  delay(degrees*4); 
+//  go(DEFAULT_SPEED);
+//  go_forward();
 }
 
 void Kinetics::smooth_right(int time){
-  go_forward();
-  analogWrite(MOTOR_LEFT_SPEED,255);   
-  analogWrite(MOTOR_RIGHT_SPEED, 150);
-  delay(time*5); 
-  go(DEFAULT_SPEED);
-  go_forward();
+  ml.dir = Direction::FORTH;
+  ml.speed = 255;
+  mr.dir = Direction::FORTH;
+  mr.speed = 150;
+  
+  action.interval(time * 5);
+  action.reset();  
+//  go_forward();
+//  analogWrite(MOTOR_LEFT_SPEED,255);   
+//  analogWrite(MOTOR_RIGHT_SPEED, 150);
+//  delay(time*5); 
+//  go(DEFAULT_SPEED);
+//  go_forward();
 }
 void Kinetics::smooth_left(int time){
-  go_forward();
-  analogWrite(MOTOR_RIGHT_SPEED,255);   
-  analogWrite(MOTOR_LEFT_SPEED, 150);
-  delay(time*5); 
-  go(DEFAULT_SPEED);
-  go_forward();
+  ml.dir = Direction::FORTH;
+  ml.speed = 150;
+  mr.dir = Direction::FORTH;
+  mr.speed = 255;
+  
+  action.interval(time * 5);
+  action.reset();  
+//  go_forward();
+//  analogWrite(MOTOR_RIGHT_SPEED,255);   
+//  analogWrite(MOTOR_LEFT_SPEED, 150);
+//  delay(time*5); 
+//  go(DEFAULT_SPEED);
+//  go_forward();
 }
 
 void Kinetics::demo_loop() {
@@ -113,6 +147,12 @@ void Kinetics::demo_loop() {
 }
 
 void Kinetics::update() {
+  // right
+  digitalWrite(MOTOR_RIGHT_DIRECTION, mr.dir);   
+  analogWrite(MOTOR_RIGHT_SPEED, mr.speed);   
+  // left
+  digitalWrite(MOTOR_LEFT_DIRECTION, ml.dir);  
+  analogWrite(MOTOR_LEFT_SPEED, ml.speed);
 }
 
 
@@ -165,3 +205,44 @@ Kinetics::levels Kinetics::getPWM(float linear_x, float linear_y, float angular_
 
   return pwm;
 }
+
+/*
+Kinetics::velocities Kinetics::getVelocities(int motor1, int motor2)
+{
+  Kinetics::velocities vel;
+
+  double average_rpm_x = (motor1 + motor2) / 2; // RPM
+  //convert revolutions per minute to revolutions per second
+  double average_rps_x = average_rpm_x / 60; // RPS
+  vel.linear_x = (average_rps_x * (wheel_diameter_ * PI)); // m/s
+
+  double average_rpm_a = (motor2 - motor1) / 2;
+  //convert revolutions per minute to revolutions per second
+  double average_rps_a = average_rpm_a / 60;
+  vel.angular_z =  (average_rps_a * (wheel_diameter_ * PI)) / base_width_;
+
+  return vel;
+}
+
+Kinetics::velocities Kinetics::getVelocities(int motor1, int motor2, int motor3, int motor4)
+{
+  Kinetics::velocities vel;
+
+  double average_rpm_x = (motor1 + motor2 + motor3 + motor4) / 4; // RPM
+  //convert revolutions per minute to revolutions per second
+  double average_rps_x = average_rpm_x / 60; // RPS
+  vel.linear_x = (average_rps_x * (wheel_diameter_ * PI)); // m/s
+
+  double average_rpm_y = (-motor1 + motor2 + motor3 - motor4) / 4; // RPM
+  //convert revolutions per minute in y axis to revolutions per second
+  double average_rps_y = average_rpm_y / 60; // RPS
+  vel.linear_y = (average_rps_y * (wheel_diameter_ * PI)); // m/s
+
+  double average_rpm_a = (-motor1 + motor2 - motor3 + motor4) / 4;
+  //convert revolutions per minute to revolutions per second
+  double average_rps_a = average_rpm_a / 60;
+  vel.angular_z =  (average_rps_a * (wheel_diameter_ * PI)) / base_width_;
+
+  return vel;
+}
+ */
