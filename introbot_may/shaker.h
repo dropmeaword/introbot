@@ -15,13 +15,18 @@ class Shaker {
       timer.interval(howlong);
       timer.reset();
       state = HIGH;
+      update();
     }
     
     void off() {
       state = LOW;
+      update();
     }
 
     void update() {
+      if(timer.check()) {
+        state = LOW;
+      }
       digitalWrite(iopin, state);
     }
 }; // class

@@ -44,7 +44,10 @@ class Kinetics {
     };
 
     motor ml, mr; // motors left and right
-     
+
+   bool sem_turn_left = true, sem_turn_right = true, sem_smooth_right = true, sem_smooth_left = true;
+  
+
     float speed;
 
     float mmWheelRadius;
@@ -81,6 +84,7 @@ class Kinetics {
     levels getPWM(float linear_x, float linear_y, float angular_z);
     int rpmToPWM(int rpm);
 
+    bool stopped() { return ((ml.speed == 0) && (mr.speed == 0)); }
     bool isMoving() { return ((ml.speed > 0) && (mr.speed > 0)); }
 
     int mappedPwmValue(int reading, int vmin, int vmax);

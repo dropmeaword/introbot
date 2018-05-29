@@ -45,12 +45,12 @@ void Kinetics::init() {
 
 void Kinetics::go_forward() {
   ml.dir = FORTH;
-  mr.dir = FORTH;
+  mr.dir = BACK;
 }
 
 void Kinetics::go_back() {
   ml.dir = BACK;
-  mr.dir = BACK;
+  mr.dir = FORTH;
 }
  
 void Kinetics::go(int val){
@@ -60,13 +60,15 @@ void Kinetics::go(int val){
 
 void Kinetics::stop() {
   Serial.println("kinetics::stop");
+  ml.dir = 0;
   ml.speed = 0;
+  mr.dir = 0;
   mr.speed = 0;
 }
 
 void Kinetics::turn_left(int degrees) {
   ml.dir = BACK;
-  ml.speed = 150;
+  ml.speed = 255;
   mr.dir = FORTH;
   mr.speed = 255;
   
@@ -85,7 +87,7 @@ void Kinetics::turn_right(int degrees){
   ml.dir = FORTH;
   ml.speed = 255;
   mr.dir = BACK;
-  mr.speed = 150;
+  mr.speed = 255;
 
   lastaction.interval(degrees * 4);
   lastaction.reset();
@@ -102,7 +104,7 @@ void Kinetics::smooth_right(int time){
   ml.dir = FORTH;
   ml.speed = 255;
   mr.dir = FORTH;
-  mr.speed = 150;
+  mr.speed = 180;
   
   lastaction.interval(time * 5);
   lastaction.reset();  
@@ -115,7 +117,7 @@ void Kinetics::smooth_right(int time){
 }
 void Kinetics::smooth_left(int time){
   ml.dir = FORTH;
-  ml.speed = 150;
+  ml.speed = 180;
   mr.dir = FORTH;
   mr.speed = 255;
   
@@ -130,36 +132,68 @@ void Kinetics::smooth_left(int time){
 }
 
 void Kinetics::demo_loop() {
+
+  if(sem_turn_left && demotimer.hasPassed(100) && !demotimer.hasPassed(5000) ) {
+    Serial.println("forward");
+    go_forward();
+    go(255);
+    sem_turn_left = false;
+  } 
   
-  if(demotimer.hasPassed(100)) {
-    Serial.println("turn left");
-    turn_left(360);
-  } else if(demotimer.hasPassed(5000)) {
-    Serial.println("turn right");
-    turn_right(360);
-  } else if(demotimer.hasPassed(10000)) {
+  if(sem_turn_right && demotimer.hasPassed(5000) && !demotimer.hasPassed(10000) ) {
+    Serial.println("back");
+    go_back();
+    go(255);
+    sem_turn_right = false;
+  }
+  
+  if(sem_smooth_right && demotimer.hasPassed(10000) && !demotimer.hasPassed(15000) ) {
     Serial.println("smooth right");
-    smooth_right(60);
-  } else if(demotimer.hasPassed(15000)) {
+    smooth_right(560);
+    sem_smooth_right = false;
+  } 
+  
+  if(sem_smooth_left && demotimer.hasPassed(15000) && !demotimer.hasPassed(20000) ) {
     Serial.println("smooth left");
-    smooth_left(60);
-  } else if(demotimer.hasPassed(20000)) {
+    smooth_left(560);
+    sem_smooth_left = false;
+  }
+  
+  if(demotimer.hasPassed(20000)) {
     demotimer.restart();
+    sem_smooth_right = true;
+    sem_smooth_left = true;
+    sem_turn_left = true;
+    sem_turn_right = true;
   }
 
-  update();
+//  update();
 }
 
 void Kinetics::update() {
-  // right
+//  if(mr.dir == 0) {
+//    stop();
+//  }
+//
+
+//  Serial.print(" r.dir: ");
+//  Serial.print(MOTOR_RIGHT_DIRECTION);
+//  Serial.print(" r.speed: ");
+//  Serial.print(MOTOR_RIGHT_SPEED);
+//  Serial.print(" l.dir: ");
+//  Serial.print(MOTOR_LEFT_DIRECTION);
+//  Serial.print(" l.speed: ");
+//  Serial.print(MOTOR_LEFT_SPEED);
+//  Serial.println();
+  
   digitalWrite(MOTOR_RIGHT_DIRECTION, mr.dir);   
-  analogWrite(MOTOR_RIGHT_SPEED, mr.speed);   
-  // left
   digitalWrite(MOTOR_LEFT_DIRECTION, ml.dir);  
+
+  analogWrite(MOTOR_RIGHT_SPEED, mr.speed);   
   analogWrite(MOTOR_LEFT_SPEED, ml.speed);
 
   // if lastaction is completed, stop
-  if(lastaction.check()) {
+  if(lastaction.check() && !stopped()) {
     stop();
   }
 }
