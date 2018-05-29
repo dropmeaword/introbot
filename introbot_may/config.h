@@ -5,7 +5,7 @@
 #define LDR_RIGHT A3
 #define LDR_LEFT  A2
 
-// motors
+// motors CHB = left, CHA = RIGHT
 #define CHB_DIR 13
 #define CHB_PWM 11
 #define CHB_BRK 8
