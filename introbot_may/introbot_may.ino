@@ -225,7 +225,7 @@ void setup() {
 
 
 void bot_loop() {
-//  eyes.read();
+  eyes.read();
 //  eyes.debug();
 //  Serial.print(",");
 
