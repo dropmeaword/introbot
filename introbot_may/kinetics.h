@@ -45,7 +45,7 @@ class Kinetics {
 
     motor ml, mr; // motors left and right
 
-   bool sem_turn_left = true, sem_turn_right = true, sem_smooth_right = true, sem_smooth_left = true;
+    bool sem_turn_left = true, sem_turn_right = true, sem_smooth_right = true, sem_smooth_left = true;
   
 
     float speed;
@@ -66,8 +66,8 @@ class Kinetics {
     void go_back();
 
     void stop();
-
     void update();
+    void debug();
 
     void go(int speed);
 

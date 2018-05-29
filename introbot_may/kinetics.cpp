@@ -174,22 +174,24 @@ void Kinetics::demo_loop() {
 //  update();
 }
 
+void Kinetics::debug() {
+  Serial.print(" r.dir: ");
+  Serial.print(MOTOR_RIGHT_DIRECTION);
+  Serial.print(" r.speed: ");
+  Serial.print(MOTOR_RIGHT_SPEED);
+  Serial.print(" l.dir: ");
+  Serial.print(MOTOR_LEFT_DIRECTION);
+  Serial.print(" l.speed: ");
+  Serial.print(MOTOR_LEFT_SPEED);
+  Serial.println();
+}
+
 void Kinetics::update() {
 //  if(mr.dir == 0) {
 //    stop();
 //  }
 //
 
-//  Serial.print(" r.dir: ");
-//  Serial.print(MOTOR_RIGHT_DIRECTION);
-//  Serial.print(" r.speed: ");
-//  Serial.print(MOTOR_RIGHT_SPEED);
-//  Serial.print(" l.dir: ");
-//  Serial.print(MOTOR_LEFT_DIRECTION);
-//  Serial.print(" l.speed: ");
-//  Serial.print(MOTOR_LEFT_SPEED);
-//  Serial.println();
-  
   digitalWrite(MOTOR_RIGHT_DIRECTION, mr.dir);   
   digitalWrite(MOTOR_RIGHT_BREAK, LOW);   
   analogWrite(MOTOR_RIGHT_SPEED, mr.speed);   
