@@ -86,9 +86,10 @@ void on_happy_leave() {
 
 void on_happy_loop() {
   slow.update();
-//  if(eyes.absdiff() > threshold) {
-//      fsm.trigger(EVENT_GOT_STRESSED);
-//  }
+
+  if(eyes.absdiff() > threshold) {
+      fsm.trigger(EVENT_GOT_STRESSED);
+  }
 }
 
 State happy("happy", &on_happy_enter, &on_happy_loop, &on_happy_leave);
@@ -122,9 +123,9 @@ void on_stressed_loop() {
   }
 
   // the following 2 if statements basically tell the bot how to calm down
-//  if(eyes.absdiff() > threshold) {
-//    calmdown.restart();
-//  }
+  if(eyes.absdiff() > threshold) {
+    calmdown.restart();
+  }
 
   if(calmdown.hasPassed(5000)) {
     fsm.trigger(EVENT_GOT_HAPPY);
@@ -166,9 +167,9 @@ void on_paranoid_loop() {
   kinetics.update();
 
   // continue in this state or calmdown?
-//  if(eyes.absdiff() > threshold) {
-//    calmdown.restart();
-//  }
+  if(eyes.absdiff() > threshold) {
+    calmdown.restart();
+  }
 
   if(calmdown.hasPassed(10000)) {
     fsm.trigger(EVENT_GOT_HAPPY);
@@ -212,8 +213,8 @@ void setup() {
   Serial.println("setup");
  
   // state transition configuration
-  //fsm.add_timed_transition(&calibrating, &happy, 5000, NULL);
-  fsm.add_timed_transition(&demo, &happy, 25000, NULL);
+  fsm.add_timed_transition(&calibrating, &happy, 5000, NULL);
+  //fsm.add_timed_transition(&demo, &happy, 25000, NULL);
   fsm.add_transition(&happy, &stressed, EVENT_GOT_STRESSED, &on_trans_happy_to_stressed);
   fsm.add_transition(&stressed, &happy, EVENT_GOT_HAPPY, &on_trans_stressed_to_happy);
   fsm.add_transition(&stressed, &paranoid, EVENT_GOT_PARANOID, &on_trans_stressed_to_paranoid);
