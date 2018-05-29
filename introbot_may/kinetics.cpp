@@ -5,6 +5,7 @@ void Kinetics::init() {
   // initialize the PWM pins
   pinMode(CHB_PWM, OUTPUT);
   digitalWrite(CHB_PWM, LOW);
+  
   // initialize the PWM pins
   pinMode(CHA_PWM, OUTPUT);
   digitalWrite(CHA_PWM, LOW);
@@ -13,6 +14,7 @@ void Kinetics::init() {
   pinMode(CHA_BRK, OUTPUT);
   digitalWrite(CHA_DIR, LOW);
   digitalWrite(CHA_BRK, LOW);
+  
   pinMode(CHB_DIR, OUTPUT);
   pinMode(CHB_BRK, OUTPUT);
   digitalWrite(CHB_DIR, LOW);
@@ -21,9 +23,11 @@ void Kinetics::init() {
   DEFAULT_SPEED = SPEED_MEDIUM;
 
   MOTOR_RIGHT_SPEED = CHA_PWM;
+  MOTOR_RIGHT_BREAK = CHA_BRK;
   MOTOR_RIGHT_DIRECTION = CHA_DIR; 
 
   MOTOR_LEFT_SPEED = CHB_PWM;
+  MOTOR_LEFT_BREAK =  CHB_BRK;
   MOTOR_LEFT_DIRECTION = CHB_DIR; 
 
   mmWheelRadius = WHEEL_RADIUS_IN_MM;
@@ -44,13 +48,13 @@ void Kinetics::init() {
 }
 
 void Kinetics::go_forward() {
-  ml.dir = FORTH;
-  mr.dir = BACK;
+  ml.dir = HIGH;
+  mr.dir = HIGH;
 }
 
 void Kinetics::go_back() {
-  ml.dir = BACK;
-  mr.dir = FORTH;
+  ml.dir = LOW;
+  mr.dir = LOW;
 }
  
 void Kinetics::go(int val){
@@ -60,16 +64,16 @@ void Kinetics::go(int val){
 
 void Kinetics::stop() {
   Serial.println("kinetics::stop");
-  ml.dir = 0;
+  ml.dir = LOW;
   ml.speed = 0;
-  mr.dir = 0;
+  mr.dir = LOW;
   mr.speed = 0;
 }
 
 void Kinetics::turn_left(int degrees) {
-  ml.dir = BACK;
+  ml.dir = LOW;
   ml.speed = 255;
-  mr.dir = FORTH;
+  mr.dir = HIGH;
   mr.speed = 255;
   
   lastaction.interval(degrees * 4);
@@ -84,9 +88,9 @@ void Kinetics::turn_left(int degrees) {
 }
 
 void Kinetics::turn_right(int degrees){
-  ml.dir = FORTH;
+  ml.dir = HIGH;
   ml.speed = 255;
-  mr.dir = BACK;
+  mr.dir = LOW;
   mr.speed = 255;
 
   lastaction.interval(degrees * 4);
@@ -101,9 +105,9 @@ void Kinetics::turn_right(int degrees){
 }
 
 void Kinetics::smooth_right(int time){
-  ml.dir = FORTH;
+  ml.dir = HIGH;
   ml.speed = 255;
-  mr.dir = FORTH;
+  mr.dir = HIGH;
   mr.speed = 180;
   
   lastaction.interval(time * 5);
@@ -116,9 +120,9 @@ void Kinetics::smooth_right(int time){
 //  go_forward();
 }
 void Kinetics::smooth_left(int time){
-  ml.dir = FORTH;
+  ml.dir = HIGH;
   ml.speed = 180;
-  mr.dir = FORTH;
+  mr.dir = HIGH;
   mr.speed = 255;
   
   lastaction.interval(time * 5);
@@ -187,9 +191,11 @@ void Kinetics::update() {
 //  Serial.println();
   
   digitalWrite(MOTOR_RIGHT_DIRECTION, mr.dir);   
-  digitalWrite(MOTOR_LEFT_DIRECTION, ml.dir);  
-
+  digitalWrite(MOTOR_RIGHT_BREAK, LOW);   
   analogWrite(MOTOR_RIGHT_SPEED, mr.speed);   
+
+  digitalWrite(MOTOR_LEFT_DIRECTION, ml.dir);  
+  digitalWrite(MOTOR_LEFT_BREAK, LOW);   
   analogWrite(MOTOR_LEFT_SPEED, ml.speed);
 
   // if lastaction is completed, stop

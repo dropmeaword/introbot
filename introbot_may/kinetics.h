@@ -54,8 +54,10 @@ class Kinetics {
     float mmWheelDistance;
 
     int MOTOR_RIGHT_SPEED;   
+    int MOTOR_RIGHT_BREAK;   
     int MOTOR_RIGHT_DIRECTION;
     int MOTOR_LEFT_SPEED;                         
+    int MOTOR_LEFT_BREAK;   
     int MOTOR_LEFT_DIRECTION;                           
     int DEFAULT_SPEED;
 
