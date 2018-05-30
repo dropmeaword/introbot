@@ -10,12 +10,12 @@ class Eye {
 
     // change the WEIGHing factors if you want to influence how much 
     // from each eye is taken into account
-    double WEIGH = 1.0;
+    float WEIGH = 1.0;
 
     AdaptiveNormalizer *mavg;
-    double reading;
+    float reading;
 
-    int vmin, vmax;
+    float vmin, vmax;
 
     Eye(int iopin) {
       LDR_PIN = iopin;
@@ -26,9 +26,7 @@ class Eye {
       delete mavg;
     }
     
-    double read() {
-      double reading = .0;
-      
+    float read() {
       // read 4 times to get a stable reading
       for (int i = 0; i < 4; i++) {
         reading += analogRead(LDR_PIN);
@@ -38,14 +36,18 @@ class Eye {
       // update minmax
       vmax = max(reading, vmax);
       vmin = min(reading, vmin);
-    
-      return (reading / 4.0);
+
+      reading = (reading / 4.0);
+
+      mavg->put(reading);
+      
+      return reading;
     }
     
     void debug() {
       Serial.print( mavg->get() );   // smooth value
-      Serial.print( "," );
-      Serial.print( mavg->var() );   // variability
+//      Serial.print( "," );
+//      Serial.print( mavg->var() );   // variability
     }
 }; // class
 
@@ -68,10 +70,10 @@ class Eyes {
     Eye &left() { return (Eye &)left_; }
     Eye &right() { return (Eye &)right_; }
     
-    double diff() { return ( (left_->reading * left_->WEIGH) - (right_->reading * right_->WEIGH) ); }
-    double absdiff() { abs(diff()); } 
+    float diff() { return ( (left_->reading * left_->WEIGH) - (right_->reading * right_->WEIGH) ); }
+    float absdiff() { return abs(diff()); } 
    
-    double read() {
+    float read() {
       left_->read();
       right_->read();
     }
@@ -80,6 +82,9 @@ class Eyes {
       left_->debug();
       Serial.print(",");
       right_->debug();
+      Serial.print(",");
+//      float d = absdiff();
+//      Serial.print(d);
     }
 }; // class
 
