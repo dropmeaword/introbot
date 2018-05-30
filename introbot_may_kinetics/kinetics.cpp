@@ -104,9 +104,8 @@ void Kinetics::turn_right(int degrees){
 }
 
 void Kinetics::smooth_right(int time){
-  ml.dir = HIGH;
+  go_forward();
   ml.speed = 255;
-  mr.dir = HIGH;
   mr.speed = 180;
   
   lastaction.interval(time * 5);
@@ -119,9 +118,8 @@ void Kinetics::smooth_right(int time){
 //  go_forward();
 }
 void Kinetics::smooth_left(int time){
-  ml.dir = HIGH;
+  go_forward();
   ml.speed = 180;
-  mr.dir = HIGH;
   mr.speed = 255;
   
   lastaction.interval(time * 5);
