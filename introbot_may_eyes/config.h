@@ -20,4 +20,7 @@
 #define PIN_SHAKER 2
 
 
+#define LDR_READ_EVERY_MS 20
+
+
 #endif

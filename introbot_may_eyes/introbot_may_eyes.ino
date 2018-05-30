@@ -71,12 +71,15 @@ void bot_loop() {
 
   Serial.print(", ");
   Serial.println(threshold);
+
+//  Serial.println(threshold);
 }
 
 void loop() {
   bot_loop();
   fsm.run_machine();
 
-  delay(20);
+  delay(LDR_READ_EVERY_MS);
+  //delay(20);
 }
 
