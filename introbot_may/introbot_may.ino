@@ -47,6 +47,7 @@ void on_calibrating_leave() {
   Serial.print("calculated threshold = ");
   Serial.println(threshold);
   eyes_reset_ranges();
+  shaker.on(500);
 }
 
 void on_calibrating_loop() {
@@ -181,7 +182,7 @@ void on_paranoid_loop() {
         kinetics.stop();
         break;
     } // switch
-    cycle.interval(random(80,500));
+    //cycle.interval(random(80,500));
   } // if
 
   // continue in this state or calmdown?
@@ -251,6 +252,7 @@ void bot_loop() {
 //    Serial.println(threshold);
   }
 
+  shaker.update();
   kinetics.update();
 }
 
