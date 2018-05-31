@@ -10,11 +10,22 @@
 #define EVENT_GOT_STRESSED 1100
 #define EVENT_GOT_PARANOID 1200
 
-Metro lookout(20);
+Metro lookout(20); // sampling frequency of LDR sensing
 
 //Eyes eyes(LDR_LEFT, LDR_RIGHT);
 
-int threshold = 8;
+int threshold = 10.0;
+
+// normalizing the smoothed signal
+// ///////////////////////////////
+// converges to around 1.30
+// takes about 1700 samples to get there
+
+// normalizing the raw signal
+// //////////////////////////
+// converges between -10, 1
+// takes about 1000 samples to get there
+
 
 // ///////////////////////////////////////////////////////////////////////////////////
 // ON DEMO

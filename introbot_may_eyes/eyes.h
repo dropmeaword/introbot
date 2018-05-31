@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include "corestats.h"
-#include "RunningAverage.h"
 #include "config.h"
 
 #define SMOOTH_FACTOR 0.8 // high values towards 1 = slow response, very smooth. 0 = input reading
@@ -11,8 +10,8 @@
 typedef struct Eye {
     int iopin;
     float weight;
-    float smoothedReading = 0;
     float reading;
+    float smooth;
     float vmin, vmax;
 };
 

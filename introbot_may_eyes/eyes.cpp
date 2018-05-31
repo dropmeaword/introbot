@@ -25,6 +25,7 @@ void eyes_init() {
   leye.iopin = LDR_LEFT;
   leye.weight = 1.0;
   leye.reading = 0;
+  leye.smooth = 0;
   leye.vmax = FLT_MIN;
   leye.vmin = FLT_MAX;
   
@@ -32,6 +33,7 @@ void eyes_init() {
   reye.iopin = LDR_RIGHT;
   reye.weight = 1.0;
   reye.reading = 0;
+  reye.smooth = 0;
   reye.vmax = FLT_MIN;
   reye.vmin = FLT_MAX;
 }
@@ -47,7 +49,7 @@ void eyes_read() {
   leye.vmin = min(leye.reading, leye.vmin);
 
   // smooth reading to remove noise
-  leye.smoothedReading = SMOOTH_FACTOR*leye.smoothedReading + (1-SMOOTH_FACTOR)*leye.reading;
+  leye.smooth = SMOOTH_FACTOR*leye.smooth + (1-SMOOTH_FACTOR)*leye.reading;
 
   lnorm.put(leye.reading);
 
@@ -60,13 +62,17 @@ void eyes_read() {
   reye.vmin = min(reye.reading, reye.vmin);
 
   // smooth reading to remove noise
-  reye.smoothedReading = SMOOTH_FACTOR*reye.smoothedReading + (1-SMOOTH_FACTOR)*reye.reading;
+  reye.smooth = SMOOTH_FACTOR*reye.smooth + (1-SMOOTH_FACTOR)*reye.reading;
 
   rnorm.put(reye.reading);
 }
 
+//float eyes_diff() { 
+//  return ( (leye.smooth * leye.weight) - (reye.smooth * reye.weight) ); 
+//}
+
 float eyes_diff() { 
-  return ( (leye.smoothedReading * leye.weight) - (reye.smoothedReading * reye.weight) ); 
+  return ( (leye.reading * leye.weight) - (reye.reading * reye.weight) ); 
 }
 
 //    float eyes_diff() { return ( (left_->mavg->getAverage() * left_->WEIGH) - (right_->mavg->getAverage() * right_->WEIGH) ); }
@@ -78,16 +84,18 @@ float eyes_absdiff() {
 void debug_eye(Eye &e) {
   Serial.print( e.reading );
   Serial.print( "," );
-  Serial.print( e.smoothedReading );
+  Serial.print( e.smooth );
 }
 
 void eyes_debug() {
-  debug_eye(leye);
-  Serial.print( "," );
-  debug_eye(reye);
-  Serial.print( "," );
+//  debug_eye(leye);
+//  Serial.print( "," );
+//  debug_eye(reye);
+//  Serial.print( "," );
   Serial.print( lnorm.get() );
   Serial.print( "," );
   Serial.print( rnorm.get() );
+  Serial.print( "," );
+  Serial.print( eyes_absdiff() );
 }
 
