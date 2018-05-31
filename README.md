@@ -30,7 +30,19 @@ Switch on the bots while you are inside the darkened play area and let them do t
 
 Your play area should be ready now!
 
-## What libraries are these?
+# A little more about the code
+
+### I want to change the time it spends calibrating or demoing
+
+In the file `introbot_may.ino` on lines 237 and 238 you can find the timed transitions, adjust these to your needs. We find that the calibration step should be a little more than 10 seconds for optimal results.
+
+### Threshold seems too high, the bot never reaches it
+
+The function `on_calibrating_loop` is what makes the threshold adaptive across time.
+
+In the file `introbot_may.ino` on lines 46 you can find this formula: `threshold = threshold + (threshold * 1.25)`, this means that the threshold is set to 125% of the last reading resulting from the sum of both eye inputs.
+
+### What libraries are used?
 
 You will need the Chrono, Metro and corestats libraries in your Arduino environment.
 
