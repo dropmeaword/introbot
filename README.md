@@ -1,3 +1,19 @@
+# Introbots
+
+#### Favara edition
+
+## Getting your Arduino ready
+
+You will need a few libraries in your Arduino environment. I have packed them up as a zipfile that you can find here called `libraries-arduino.zip`.
+
+To install them simply uncompress that zipfile onto your `~/Documents/Arduino` folder. You have to do that before you start the Arduino programming environment.
+
+## What code should we load on the bots?
+
+When you download this repo you will be getting a bunch of stuff, but the primary sketch for the *introbots* is named `introbot_may`.
+
+## What libraries are these?
+
 You will need the Chrono, Metro and corestats libraries in your Arduino environment.
 
 https://github.com/SofaPirate/Chrono.git
