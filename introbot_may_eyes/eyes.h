@@ -21,6 +21,10 @@ void eyes_init();
 void eyes_read();
 float eyes_diff();
 float eyes_absdiff();
+
+float eyes_sum();
+float eyes_abssum();
+
 void eyes_debug();
 
 

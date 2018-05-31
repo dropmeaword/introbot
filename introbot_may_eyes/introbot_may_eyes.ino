@@ -26,6 +26,23 @@ int threshold = 10.0;
 // converges between -10, 1
 // takes about 1000 samples to get there
 
+// ///////////////////////////////////////////////////////////////////////////////////
+// ON CALIBRATING
+// ///////////////////////////////////////////////////////////////////////////////////
+void on_calibrating_enter() {
+  Serial.println("on_calibrating_enter");
+}
+
+void on_calibrating_leave() {
+  Serial.println("on_calibrating_leave");
+  threshold = threshold + (threshold * 1.25);
+}
+
+void on_calibrating_loop() {
+  threshold = ceil(eyes_abssum()); //max(leye.vmax, reye.vmax); //ceil(eyes_absdiff());
+}
+
+State calibrating("calibrating", &on_calibrating_enter, &on_calibrating_loop, &on_calibrating_leave);
 
 // ///////////////////////////////////////////////////////////////////////////////////
 // ON DEMO
@@ -42,17 +59,16 @@ void on_demo_loop() {
 }
 
 State demo("demo", &on_demo_enter, &on_demo_loop, &on_demo_leave);
-Fsm fsm(&demo);
 
 // ///////////////////////////////////////////////////////////////////////////////////
 // ON HAPPY
 // ///////////////////////////////////////////////////////////////////////////////////
 void on_happy_enter() {
-//  Serial.println("on_happy_enter");
+  Serial.println("on_happy_enter");
 }
 
 void on_happy_leave() {
-//  Serial.println("on_happy_leave");
+  Serial.println("on_happy_leave");
 }
 
 void on_happy_loop() {
@@ -62,6 +78,7 @@ State happy("happy", &on_happy_enter, &on_happy_loop, &on_happy_leave);
 
 // ///////////////////////////////////////////////////////////////////////////////////
 // ///////////////////////////////////////////////////////////////////////////////////
+Fsm fsm(&calibrating);
 // ///////////////////////////////////////////////////////////////////////////////////
 // ///////////////////////////////////////////////////////////////////////////////////
 void setup() {
@@ -72,8 +89,9 @@ void setup() {
 //  Serial.println("setup()");
 
   // state transition configuration
-  //fsm.add_timed_transition(&calibrating, &happy, 5000, NULL);
-  fsm.add_timed_transition(&demo, &happy, 2000, NULL);
+  fsm.add_timed_transition(&calibrating, &happy, 15000, NULL);
+  //fsm.add_timed_transition(&demo, &happy, 2000, NULL);
+  fsm.add_transition(&happy, &demo, EVENT_GOT_STRESSED, NULL);
 
 //  Serial.println("fsm up");
 }
@@ -91,8 +109,5 @@ void bot_loop() {
 void loop() {
   bot_loop();
   fsm.run_machine();
-
-  delay(LDR_READ_EVERY_MS);
-  //delay(20);
 }
 

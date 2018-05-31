@@ -81,6 +81,14 @@ float eyes_absdiff() {
   return abs(eyes_diff()); 
 } 
 
+float eyes_sum() { 
+  return ( (leye.reading * leye.weight) + (reye.reading * reye.weight) ); 
+}
+
+float eyes_abssum() { 
+  return abs(eyes_sum()); 
+} 
+
 void debug_eye(Eye &e) {
   Serial.print( e.reading );
   Serial.print( "," );
@@ -96,6 +104,6 @@ void eyes_debug() {
   Serial.print( "," );
   Serial.print( rnorm.get() );
   Serial.print( "," );
-  Serial.print( eyes_absdiff() );
+  Serial.print( eyes_abssum() );
 }
 
