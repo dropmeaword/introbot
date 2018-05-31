@@ -137,26 +137,26 @@ void Kinetics::demo_loop() {
   if(sem_turn_left && demotimer.hasPassed(100) && !demotimer.hasPassed(2000) ) {
     Serial.println("forward");
     go_forward();
-    go(255);
+    go(128);
     sem_turn_left = false;
   } 
   
   if(sem_turn_right && demotimer.hasPassed(2000) && !demotimer.hasPassed(5000) ) {
     Serial.println("back");
     go_back();
-    go(255);
+    go(128);
     sem_turn_right = false;
   }
   
   if(sem_smooth_right && demotimer.hasPassed(5000) && !demotimer.hasPassed(7000) ) {
-    Serial.println("smooth right");
-    smooth_right(560);
+    Serial.println("right");
+    turn_left();
     sem_smooth_right = false;
   } 
   
   if(sem_smooth_left && demotimer.hasPassed(7000) && !demotimer.hasPassed(10000) ) {
-    Serial.println("smooth left");
-    smooth_left(560);
+    Serial.println("left");
+    turn_right();
     sem_smooth_left = false;
   }
   
@@ -258,14 +258,17 @@ int Kinetics::mappedPwmValue(int reading, int vmin, int vmax) {
   int val;
 
   val = map(reading, vmin, vmax, 0, 1023);
-  val = val / 4;
+  val = val / 2;
 
   return constrain(val, 0, 255);
 }
 
 void Kinetics::steer_with_light() {
-  ml.speed = mappedPwmValue(leye.reading, leye.vmin, leye.vmax);
-  mr.speed = mappedPwmValue(reye.reading, reye.vmin, reye.vmax);
+  go_forward();
+  int leftSpeed = mappedPwmValue(leye.reading, leye.vmin, leye.vmax);
+  int rightSpeed = mappedPwmValue(reye.reading, reye.vmin, reye.vmax);
+  ml.speed = (3*leftSpeed+1*rightSpeed)/4;
+  mr.speed = (3*rightSpeed+1*leftSpeed)/4;
 }
 
 

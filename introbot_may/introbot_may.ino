@@ -134,7 +134,7 @@ void on_stressed_loop() {
     calmdown.restart();
   }
 
-  if(calmdown.hasPassed(5000)) {
+  if(calmdown.hasPassed(2000)) {
     fsm.trigger(EVENT_GOT_HAPPY);
   }
 }
@@ -145,6 +145,8 @@ State stressed("stressed", &on_stressed_enter, &on_stressed_loop, &on_stressed_l
 // ///////////////////////////////////////////////////////////////////////////////////
 // ON PARANOID
 // ///////////////////////////////////////////////////////////////////////////////////
+Metro cycle(500);
+
 void on_paranoid_enter() {
   Serial.println("on_paranoid_enter");
   fast.flash();
@@ -166,14 +168,21 @@ void on_paranoid_loop() {
   shaker.update();
 
   // spin randomly
-  if (random(2)<1) {
-    kinetics.turn_right();
-  } else {
-    kinetics.turn_left();
-  }
-
-  // run kinetics loop
-  kinetics.update();
+  if(cycle.check()) {
+    int chooser = random(3);
+    switch(chooser) {
+      case 0:
+        kinetics.turn_right();
+        break;
+      case 1:
+        kinetics.turn_left();
+        break;
+      case 2:
+        kinetics.stop();
+        break;
+    } // switch
+    cycle.interval(random(80,500));
+  } // if
 
   // continue in this state or calmdown?
   if(eyes_abssum() > threshold) {
