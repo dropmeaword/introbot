@@ -16,11 +16,8 @@ int pinLEDS[LED_COUNT] = {10, 5, 6};
 #define EVENT_GOT_PARANOID 1200
 
 
-Eyes eyes(LDR_LEFT, LDR_RIGHT);
 Shaker shaker(PIN_SHAKER);
 Kinetics kinetics;
-
-int threshold = 8;
 
 Flasher superfast(pinLEDS, LED_COUNT, 0.4);
 Flasher slow(pinLEDS, LED_COUNT, 0.009);
@@ -33,18 +30,28 @@ Flasher fast(pinLEDS, LED_COUNT, 0.06);
 Chrono calmdown;
 int stressCounter = 0;
 
+Metro lookout(20); // sampling frequency of LDR sensing
+
 // ///////////////////////////////////////////////////////////////////////////////////
 // ON CALIBRATING
 // ///////////////////////////////////////////////////////////////////////////////////
+int threshold = 10.0;
+
 void on_calibrating_enter() {
   Serial.println("on_calibrating_enter");
 }
 
 void on_calibrating_leave() {
   Serial.println("on_calibrating_leave");
+  threshold = threshold + (threshold * 1.25);
+  Serial.print("calculated threshold = ");
+  Serial.println(threshold);
+  eyes_reset_ranges();
+  shaker.on(500);
 }
 
 void on_calibrating_loop() {
+  threshold = ceil(eyes_abssum()); //max(leye.vmax, reye.vmax); //ceil(eyes_absdiff());
 }
 
 State calibrating("calibrating", &on_calibrating_enter, &on_calibrating_loop, &on_calibrating_leave);
@@ -69,6 +76,8 @@ void on_demo_loop() {
 }
 
 State demo("demo", &on_demo_enter, &on_demo_loop, &on_demo_leave);
+
+//Fsm fsm(&calibrating);
 Fsm fsm(&demo);
 
 // ///////////////////////////////////////////////////////////////////////////////////
@@ -87,7 +96,7 @@ void on_happy_leave() {
 void on_happy_loop() {
   slow.update();
 
-  if(eyes.absdiff() > threshold) {
+  if(eyes_abssum() > threshold) {
       fsm.trigger(EVENT_GOT_STRESSED);
   }
 }
@@ -100,7 +109,7 @@ State happy("happy", &on_happy_enter, &on_happy_loop, &on_happy_leave);
 void on_stressed_enter() {
   Serial.println("on_stressed_enter");
   fast.flash();
-  shaker.on(5000);
+  shaker.on(500);
   stressCounter++;
 }
 
@@ -115,19 +124,18 @@ void on_stressed_loop() {
   fast.update();
   shaker.update();
 
-//  kinetics.steer_with_light( eyes );
-  kinetics.update();
+  kinetics.steer_with_light();
 
   if(stressCounter > 3) {
     fsm.trigger(EVENT_GOT_PARANOID);
   }
 
   // the following 2 if statements basically tell the bot how to calm down
-  if(eyes.absdiff() > threshold) {
+  if(eyes_abssum() > threshold) {
     calmdown.restart();
   }
 
-  if(calmdown.hasPassed(5000)) {
+  if(calmdown.hasPassed(2000)) {
     fsm.trigger(EVENT_GOT_HAPPY);
   }
 }
@@ -138,6 +146,8 @@ State stressed("stressed", &on_stressed_enter, &on_stressed_loop, &on_stressed_l
 // ///////////////////////////////////////////////////////////////////////////////////
 // ON PARANOID
 // ///////////////////////////////////////////////////////////////////////////////////
+Metro cycle(500);
+
 void on_paranoid_enter() {
   Serial.println("on_paranoid_enter");
   fast.flash();
@@ -149,25 +159,34 @@ void on_paranoid_leave() {
   Serial.println("on_paranoid_leave");
   fast.stop();
   shaker.off();
+  stressCounter = 0;
 }
 
 void on_paranoid_loop() {
   fast.update();
+
   shaker.on(500);
   shaker.update();
 
   // spin randomly
-  if (random(2)<1) {
-    kinetics.turn_right(360);
-  } else {
-    kinetics.turn_left(360);
-  }
-
-  // run kinetics loop
-  kinetics.update();
+  if(cycle.check()) {
+    int chooser = random(3);
+    switch(chooser) {
+      case 0:
+        kinetics.turn_right();
+        break;
+      case 1:
+        kinetics.turn_left();
+        break;
+      case 2:
+        kinetics.stop();
+        break;
+    } // switch
+    //cycle.interval(random(80,500));
+  } // if
 
   // continue in this state or calmdown?
-  if(eyes.absdiff() > threshold) {
+  if(eyes_abssum() > threshold) {
     calmdown.restart();
   }
 
@@ -203,36 +222,38 @@ void on_trans_stressed_to_happy()
 // ///////////////////////////////////////////////////////////////////////////////////
 void setup() {
   Serial.begin(115200);
-  while(!Serial);
+  //while(!Serial);
 
   Serial.println("setup()");
- 
+
+  eyes_init();
+
   kinetics.init();
   kinetics.stop();
 
   Serial.println("setup");
  
   // state transition configuration
+  fsm.add_timed_transition(&demo, &calibrating, 10000, NULL);
   fsm.add_timed_transition(&calibrating, &happy, 5000, NULL);
-  //fsm.add_timed_transition(&demo, &happy, 25000, NULL);
+//  fsm.add_timed_transition(&demo, &happy, 25000, NULL);
   fsm.add_transition(&happy, &stressed, EVENT_GOT_STRESSED, &on_trans_happy_to_stressed);
   fsm.add_transition(&stressed, &happy, EVENT_GOT_HAPPY, &on_trans_stressed_to_happy);
   fsm.add_transition(&stressed, &paranoid, EVENT_GOT_PARANOID, &on_trans_stressed_to_paranoid);
   fsm.add_transition(&paranoid, &happy, EVENT_GOT_HAPPY, NULL);
-
-  Serial.println("fsm up");
 }
 
 
 void bot_loop() {
-  eyes.read();
-//  eyes.debug();
-//  Serial.print(",");
+  if( lookout.check() ) {
+    eyes_read();
+//    eyes_debug();
+//    Serial.print(", ");
+//    Serial.println(threshold);
+  }
 
+  shaker.update();
   kinetics.update();
-
-//  Serial.print(", ");
-//  Serial.println(threshold);
 }
 
 void loop() {

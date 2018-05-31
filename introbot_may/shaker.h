@@ -29,6 +29,8 @@ class Shaker {
       }
       digitalWrite(iopin, state);
     }
+
+    void isOn() { return state; }
 }; // class
 
 #endif // __SHAKER_H__

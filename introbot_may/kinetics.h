@@ -71,14 +71,14 @@ class Kinetics {
 
     void go(int speed);
 
-    void turn_left(int degrees);
-    void turn_right(int degrees);
+    void turn_left(int degrees = 100);
+    void turn_right(int degrees = 100);
 
     void smooth_right(int time);
     void smooth_left(int time);
     void demo_loop();
 
-    void steer_with_light(Eyes &eyes);
+    void steer_with_light();
 
 //    velocities getVelocities(int motor1, int motor2);
 //    velocities getVelocities(int motor1, int motor2, int motor3, int motor4);

@@ -36,6 +36,8 @@ void on_calibrating_enter() {
 void on_calibrating_leave() {
   Serial.println("on_calibrating_leave");
   threshold = threshold + (threshold * 1.25);
+  Serial.print("calculated threshold = ");
+  Serial.println(threshold);
 }
 
 void on_calibrating_loop() {
@@ -100,9 +102,9 @@ void setup() {
 void bot_loop() {
   if( lookout.check() ) {
     eyes_read();
-    eyes_debug();
-    Serial.print(", ");
-    Serial.println(threshold);
+//    eyes_debug();
+//    Serial.print(", ");
+//    Serial.println(threshold);
   }
 }
 

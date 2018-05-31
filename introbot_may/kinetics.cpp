@@ -22,13 +22,13 @@ void Kinetics::init() {
 
   DEFAULT_SPEED = SPEED_MEDIUM;
 
-  MOTOR_RIGHT_SPEED = CHA_PWM;
-  MOTOR_RIGHT_BREAK = CHA_BRK;
-  MOTOR_RIGHT_DIRECTION = CHA_DIR; 
+  MOTOR_LEFT_SPEED = CHA_PWM;
+  MOTOR_LEFT_BREAK = CHA_BRK;
+  MOTOR_LEFT_DIRECTION = CHA_DIR; 
 
-  MOTOR_LEFT_SPEED = CHB_PWM;
-  MOTOR_LEFT_BREAK =  CHB_BRK;
-  MOTOR_LEFT_DIRECTION = CHB_DIR; 
+  MOTOR_RIGHT_SPEED = CHB_PWM;
+  MOTOR_RIGHT_BREAK =  CHB_BRK;
+  MOTOR_RIGHT_DIRECTION = CHB_DIR; 
 
   mmWheelRadius = WHEEL_RADIUS_IN_MM;
   mmWheelDistance = WHEEL_RADIUS_IN_MM;
@@ -49,12 +49,12 @@ void Kinetics::init() {
 
 void Kinetics::go_forward() {
   ml.dir = HIGH;
-  mr.dir = HIGH;
+  mr.dir = LOW;
 }
 
 void Kinetics::go_back() {
   ml.dir = LOW;
-  mr.dir = LOW;
+  mr.dir = HIGH;
 }
  
 void Kinetics::go(int val){
@@ -63,7 +63,6 @@ void Kinetics::go(int val){
 }
 
 void Kinetics::stop() {
-  Serial.println("kinetics::stop");
   ml.dir = LOW;
   ml.speed = 0;
   mr.dir = LOW;
@@ -73,7 +72,7 @@ void Kinetics::stop() {
 void Kinetics::turn_left(int degrees) {
   ml.dir = LOW;
   ml.speed = 255;
-  mr.dir = HIGH;
+  mr.dir = LOW;
   mr.speed = 255;
   
   lastaction.interval(degrees * 4);
@@ -90,7 +89,7 @@ void Kinetics::turn_left(int degrees) {
 void Kinetics::turn_right(int degrees){
   ml.dir = HIGH;
   ml.speed = 255;
-  mr.dir = LOW;
+  mr.dir = HIGH;
   mr.speed = 255;
 
   lastaction.interval(degrees * 4);
@@ -105,9 +104,8 @@ void Kinetics::turn_right(int degrees){
 }
 
 void Kinetics::smooth_right(int time){
-  ml.dir = HIGH;
+  go_forward();
   ml.speed = 255;
-  mr.dir = HIGH;
   mr.speed = 180;
   
   lastaction.interval(time * 5);
@@ -120,9 +118,8 @@ void Kinetics::smooth_right(int time){
 //  go_forward();
 }
 void Kinetics::smooth_left(int time){
-  ml.dir = HIGH;
+  go_forward();
   ml.speed = 180;
-  mr.dir = HIGH;
   mr.speed = 255;
   
   lastaction.interval(time * 5);
@@ -137,33 +134,33 @@ void Kinetics::smooth_left(int time){
 
 void Kinetics::demo_loop() {
 
-  if(sem_turn_left && demotimer.hasPassed(100) && !demotimer.hasPassed(5000) ) {
+  if(sem_turn_left && demotimer.hasPassed(100) && !demotimer.hasPassed(2000) ) {
     Serial.println("forward");
     go_forward();
-    go(255);
+    go(128);
     sem_turn_left = false;
   } 
   
-  if(sem_turn_right && demotimer.hasPassed(5000) && !demotimer.hasPassed(10000) ) {
+  if(sem_turn_right && demotimer.hasPassed(2000) && !demotimer.hasPassed(5000) ) {
     Serial.println("back");
     go_back();
-    go(255);
+    go(128);
     sem_turn_right = false;
   }
   
-  if(sem_smooth_right && demotimer.hasPassed(10000) && !demotimer.hasPassed(15000) ) {
-    Serial.println("smooth right");
-    smooth_right(560);
+  if(sem_smooth_right && demotimer.hasPassed(5000) && !demotimer.hasPassed(7000) ) {
+    Serial.println("right");
+    turn_left();
     sem_smooth_right = false;
   } 
   
-  if(sem_smooth_left && demotimer.hasPassed(15000) && !demotimer.hasPassed(20000) ) {
-    Serial.println("smooth left");
-    smooth_left(560);
+  if(sem_smooth_left && demotimer.hasPassed(7000) && !demotimer.hasPassed(10000) ) {
+    Serial.println("left");
+    turn_right();
     sem_smooth_left = false;
   }
   
-  if(demotimer.hasPassed(20000)) {
+  if(demotimer.hasPassed(10000)) {
     demotimer.restart();
     sem_smooth_right = true;
     sem_smooth_left = true;
@@ -261,14 +258,17 @@ int Kinetics::mappedPwmValue(int reading, int vmin, int vmax) {
   int val;
 
   val = map(reading, vmin, vmax, 0, 1023);
-  val = val / 4;
+  val = val / 2;
 
   return constrain(val, 0, 255);
 }
 
-void Kinetics::steer_with_light(Eyes &eyes) {
-  ml.speed = mappedPwmValue(eyes.left().reading, eyes.left().vmin, eyes.left().vmax);
-  mr.speed = mappedPwmValue(eyes.right().reading, eyes.right().vmin, eyes.right().vmax);
+void Kinetics::steer_with_light() {
+  go_forward();
+  int leftSpeed = mappedPwmValue(leye.reading, leye.vmin, leye.vmax);
+  int rightSpeed = mappedPwmValue(reye.reading, reye.vmin, reye.vmax);
+  ml.speed = (3*leftSpeed+1*rightSpeed)/4;
+  mr.speed = (3*rightSpeed+1*leftSpeed)/4;
 }
 
 
