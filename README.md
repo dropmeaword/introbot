@@ -14,9 +14,9 @@ When you download this repo you will be getting a bunch of stuff, but the primar
 
 ## Description of the bot's behaviour
 
-When the new coded is loaded up the bot will behave in the following way:
-- 10 second demo, goes forword, then backward, then rotates left, then rotates right
-- 15 seconds of calibration, the bot will adapt to light levels during this time and will set the thresholds for interaction
+When the new code is loaded on the bot, it will behave in the following way:
+- 10 second demo, goes forward, then backward, then rotates left, then rotates right
+- 15 seconds of calibration, the bot will adapt to light levels during this time and will set the thresholds for interaction adaptively
 - when the calibration terminates the bot will buzz for a brief instant
 - after the buzzing the bot goes into *happy* mode and is ready for interaction
 
