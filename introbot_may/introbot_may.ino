@@ -44,6 +44,8 @@ void on_calibrating_enter() {
 void on_calibrating_leave() {
   Serial.println("on_calibrating_leave");
   threshold = threshold + (threshold * 1.25);
+  Serial.print("calculated threshold = ");
+  Serial.println(threshold);
   eyes_reset_ranges();
 }
 
@@ -74,7 +76,8 @@ void on_demo_loop() {
 
 State demo("demo", &on_demo_enter, &on_demo_loop, &on_demo_leave);
 
-Fsm fsm(&calibrating);
+//Fsm fsm(&calibrating);
+Fsm fsm(&demo);
 
 // ///////////////////////////////////////////////////////////////////////////////////
 // ON HAPPY
@@ -105,7 +108,7 @@ State happy("happy", &on_happy_enter, &on_happy_loop, &on_happy_leave);
 void on_stressed_enter() {
   Serial.println("on_stressed_enter");
   fast.flash();
-  shaker.on(5000);
+  shaker.on(500);
   stressCounter++;
 }
 
@@ -209,7 +212,7 @@ void on_trans_stressed_to_happy()
 // ///////////////////////////////////////////////////////////////////////////////////
 void setup() {
   Serial.begin(115200);
-  while(!Serial);
+  //while(!Serial);
 
   Serial.println("setup()");
 
@@ -221,7 +224,8 @@ void setup() {
   Serial.println("setup");
  
   // state transition configuration
-  fsm.add_timed_transition(&calibrating, &happy, 15000, NULL);
+  fsm.add_timed_transition(&demo, &calibrating, 10000, NULL);
+  fsm.add_timed_transition(&calibrating, &happy, 5000, NULL);
 //  fsm.add_timed_transition(&demo, &happy, 25000, NULL);
   fsm.add_transition(&happy, &stressed, EVENT_GOT_STRESSED, &on_trans_happy_to_stressed);
   fsm.add_transition(&stressed, &happy, EVENT_GOT_HAPPY, &on_trans_stressed_to_happy);
@@ -233,9 +237,9 @@ void setup() {
 void bot_loop() {
   if( lookout.check() ) {
     eyes_read();
-    eyes_debug();
-    Serial.print(", ");
-    Serial.println(threshold);
+//    eyes_debug();
+//    Serial.print(", ");
+//    Serial.println(threshold);
   }
 
   kinetics.update();

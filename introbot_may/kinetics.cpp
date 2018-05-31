@@ -134,33 +134,33 @@ void Kinetics::smooth_left(int time){
 
 void Kinetics::demo_loop() {
 
-  if(sem_turn_left && demotimer.hasPassed(100) && !demotimer.hasPassed(5000) ) {
+  if(sem_turn_left && demotimer.hasPassed(100) && !demotimer.hasPassed(2000) ) {
     Serial.println("forward");
     go_forward();
     go(255);
     sem_turn_left = false;
   } 
   
-  if(sem_turn_right && demotimer.hasPassed(5000) && !demotimer.hasPassed(10000) ) {
+  if(sem_turn_right && demotimer.hasPassed(2000) && !demotimer.hasPassed(5000) ) {
     Serial.println("back");
     go_back();
     go(255);
     sem_turn_right = false;
   }
   
-  if(sem_smooth_right && demotimer.hasPassed(10000) && !demotimer.hasPassed(15000) ) {
+  if(sem_smooth_right && demotimer.hasPassed(5000) && !demotimer.hasPassed(7000) ) {
     Serial.println("smooth right");
     smooth_right(560);
     sem_smooth_right = false;
   } 
   
-  if(sem_smooth_left && demotimer.hasPassed(15000) && !demotimer.hasPassed(20000) ) {
+  if(sem_smooth_left && demotimer.hasPassed(7000) && !demotimer.hasPassed(10000) ) {
     Serial.println("smooth left");
     smooth_left(560);
     sem_smooth_left = false;
   }
   
-  if(demotimer.hasPassed(20000)) {
+  if(demotimer.hasPassed(10000)) {
     demotimer.restart();
     sem_smooth_right = true;
     sem_smooth_left = true;
