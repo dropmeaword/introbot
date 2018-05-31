@@ -4,7 +4,7 @@
 
 ## Getting your Arduino ready
 
-You will need a few libraries in your Arduino environment. I have packed them up as a zipfile that you can find here called `libraries-arduino.zip`.
+You will need a few libraries in your Arduino environment. I have packed them up as a zipfile that you can find here called `libraries-arduino.zip`, that you can [download directly by clicking here](https://github.com/dropmeaword/introbot/raw/master/libraries-arduino.zip).
 
 To install them simply uncompress that zipfile onto your `~/Documents/Arduino` folder. You have to do that before you start the Arduino programming environment.
 
