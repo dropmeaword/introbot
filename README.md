@@ -20,6 +20,8 @@ When the new code is loaded on the bot, it will behave in the following way:
 - when the calibration terminates the bot will buzz for a brief instant
 - after the buzzing the bot goes into *happy* mode and is ready for interaction
 
+When the bot gets a light stimulus while she's happy it will go into *stressed mode*, in stressed mode it will move away from the light by recoiling away from the light. If the bot doesn't receive any light stimuli for more than 2 seconds it will go back to *happy* mode. When the bot goes to *stressed mode* for a third time it will get into *paranoid mode* which will trigger a series of somewhat random on-the-spot movements, by rotating randomly. The robot stays in *paranoid mode* for as long as it doesn't receive any light stimulus for at least 10 seconds.
+
 ## What libraries are these?
 
 You will need the Chrono, Metro and corestats libraries in your Arduino environment.
