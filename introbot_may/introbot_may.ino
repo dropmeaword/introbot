@@ -235,7 +235,7 @@ void setup() {
  
   // state transition configuration
   fsm.add_timed_transition(&demo, &calibrating, 10000, NULL);
-  fsm.add_timed_transition(&calibrating, &happy, 5000, NULL);
+  fsm.add_timed_transition(&calibrating, &happy, 15000, NULL);
 //  fsm.add_timed_transition(&demo, &happy, 25000, NULL);
   fsm.add_transition(&happy, &stressed, EVENT_GOT_STRESSED, &on_trans_happy_to_stressed);
   fsm.add_transition(&stressed, &happy, EVENT_GOT_HAPPY, &on_trans_stressed_to_happy);
