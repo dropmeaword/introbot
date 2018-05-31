@@ -22,6 +22,14 @@ When the new code is loaded on the bot, it will behave in the following way:
 
 When the bot gets a light stimulus while she's happy it will go into *stressed mode*, in stressed mode it will move away from the light by recoiling away from the light. If the bot doesn't receive any light stimuli for more than 2 seconds it will go back to *happy* mode. When the bot goes to *stressed mode* for a third time it will get into *paranoid mode* which will trigger a series of somewhat random on-the-spot movements, by rotating randomly. The robot stays in *paranoid mode* for as long as it doesn't receive any light stimulus for at least 10 seconds.
 
+## Setting up the play area
+
+The room must be reasonably darkened. There is no need for perfect darkness, just enough darkness to give good light differentials with the torches that you will use in the game is enough.
+
+Switch on the bots while you are inside the darkened play area and let them do their thing for the first 40 seconds or so.
+
+Your play area should be ready now!
+
 ## What libraries are these?
 
 You will need the Chrono, Metro and corestats libraries in your Arduino environment.
