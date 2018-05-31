@@ -1,4 +1,5 @@
 #include <SoftwareSerial.h>
+#include <Metro.h>
 
 #include "statemachine.h"
 #include "config.h"
@@ -9,8 +10,9 @@
 #define EVENT_GOT_STRESSED 1100
 #define EVENT_GOT_PARANOID 1200
 
+Metro lookout(20);
 
-Eyes eyes(LDR_LEFT, LDR_RIGHT);
+//Eyes eyes(LDR_LEFT, LDR_RIGHT);
 
 int threshold = 8;
 
@@ -55,6 +57,7 @@ void setup() {
   Serial.begin(115200);
   while(!Serial);
 
+  eyes_init();
 //  Serial.println("setup()");
 
   // state transition configuration
@@ -66,13 +69,12 @@ void setup() {
 
 
 void bot_loop() {
-  eyes.read();
-  eyes.debug();
-
-  Serial.print(", ");
-  Serial.println(threshold);
-
-//  Serial.println(threshold);
+  if( lookout.check() ) {
+    eyes_read();
+    eyes_debug();
+    Serial.print(", ");
+    Serial.println(threshold);
+  }
 }
 
 void loop() {
