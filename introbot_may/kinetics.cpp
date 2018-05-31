@@ -22,13 +22,13 @@ void Kinetics::init() {
 
   DEFAULT_SPEED = SPEED_MEDIUM;
 
-  MOTOR_RIGHT_SPEED = CHA_PWM;
-  MOTOR_RIGHT_BREAK = CHA_BRK;
-  MOTOR_RIGHT_DIRECTION = CHA_DIR; 
+  MOTOR_LEFT_SPEED = CHA_PWM;
+  MOTOR_LEFT_BREAK = CHA_BRK;
+  MOTOR_LEFT_DIRECTION = CHA_DIR; 
 
-  MOTOR_LEFT_SPEED = CHB_PWM;
-  MOTOR_LEFT_BREAK =  CHB_BRK;
-  MOTOR_LEFT_DIRECTION = CHB_DIR; 
+  MOTOR_RIGHT_SPEED = CHB_PWM;
+  MOTOR_RIGHT_BREAK =  CHB_BRK;
+  MOTOR_RIGHT_DIRECTION = CHB_DIR; 
 
   mmWheelRadius = WHEEL_RADIUS_IN_MM;
   mmWheelDistance = WHEEL_RADIUS_IN_MM;
@@ -49,12 +49,12 @@ void Kinetics::init() {
 
 void Kinetics::go_forward() {
   ml.dir = HIGH;
-  mr.dir = HIGH;
+  mr.dir = LOW;
 }
 
 void Kinetics::go_back() {
   ml.dir = LOW;
-  mr.dir = LOW;
+  mr.dir = HIGH;
 }
  
 void Kinetics::go(int val){
@@ -63,7 +63,6 @@ void Kinetics::go(int val){
 }
 
 void Kinetics::stop() {
-  Serial.println("kinetics::stop");
   ml.dir = LOW;
   ml.speed = 0;
   mr.dir = LOW;
@@ -73,7 +72,7 @@ void Kinetics::stop() {
 void Kinetics::turn_left(int degrees) {
   ml.dir = LOW;
   ml.speed = 255;
-  mr.dir = HIGH;
+  mr.dir = LOW;
   mr.speed = 255;
   
   lastaction.interval(degrees * 4);
@@ -90,7 +89,7 @@ void Kinetics::turn_left(int degrees) {
 void Kinetics::turn_right(int degrees){
   ml.dir = HIGH;
   ml.speed = 255;
-  mr.dir = LOW;
+  mr.dir = HIGH;
   mr.speed = 255;
 
   lastaction.interval(degrees * 4);
@@ -105,9 +104,8 @@ void Kinetics::turn_right(int degrees){
 }
 
 void Kinetics::smooth_right(int time){
-  ml.dir = HIGH;
+  go_forward();
   ml.speed = 255;
-  mr.dir = HIGH;
   mr.speed = 180;
   
   lastaction.interval(time * 5);
@@ -120,9 +118,8 @@ void Kinetics::smooth_right(int time){
 //  go_forward();
 }
 void Kinetics::smooth_left(int time){
-  ml.dir = HIGH;
+  go_forward();
   ml.speed = 180;
-  mr.dir = HIGH;
   mr.speed = 255;
   
   lastaction.interval(time * 5);
@@ -266,9 +263,9 @@ int Kinetics::mappedPwmValue(int reading, int vmin, int vmax) {
   return constrain(val, 0, 255);
 }
 
-void Kinetics::steer_with_light(Eyes &eyes) {
-  ml.speed = mappedPwmValue(eyes.left().reading, eyes.left().vmin, eyes.left().vmax);
-  mr.speed = mappedPwmValue(eyes.right().reading, eyes.right().vmin, eyes.right().vmax);
+void Kinetics::steer_with_light() {
+  ml.speed = mappedPwmValue(leye.reading, leye.vmin, leye.vmax);
+  mr.speed = mappedPwmValue(reye.reading, reye.vmin, reye.vmax);
 }
 
 
