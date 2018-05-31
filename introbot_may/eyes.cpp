@@ -13,7 +13,7 @@ float read_ldr(int ipin) {
   // read 4 times to get a stable reading
   for (int i = 0; i < 4; i++) {
     reading += analogRead(ipin);
-    delay(2);
+    //delay(2);
   }
 
   reading = (reading / 4.0);

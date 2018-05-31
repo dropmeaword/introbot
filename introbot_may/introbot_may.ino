@@ -120,8 +120,7 @@ void on_stressed_loop() {
   fast.update();
   shaker.update();
 
-//  kinetics.steer_with_light( eyes );
-  kinetics.update();
+  kinetics.steer_with_light();
 
   if(stressCounter > 3) {
     fsm.trigger(EVENT_GOT_PARANOID);
@@ -154,18 +153,20 @@ void on_paranoid_leave() {
   Serial.println("on_paranoid_leave");
   fast.stop();
   shaker.off();
+  stressCounter = 0;
 }
 
 void on_paranoid_loop() {
   fast.update();
+
   shaker.on(500);
   shaker.update();
 
   // spin randomly
   if (random(2)<1) {
-    kinetics.turn_right(360);
+    kinetics.turn_right();
   } else {
-    kinetics.turn_left(360);
+    kinetics.turn_left();
   }
 
   // run kinetics loop
@@ -220,12 +221,12 @@ void setup() {
   Serial.println("setup");
  
   // state transition configuration
-  fsm.add_timed_transition(&calibrating, &happy, 5000, NULL);
+  fsm.add_timed_transition(&calibrating, &happy, 15000, NULL);
 //  fsm.add_timed_transition(&demo, &happy, 25000, NULL);
   fsm.add_transition(&happy, &stressed, EVENT_GOT_STRESSED, &on_trans_happy_to_stressed);
-//  fsm.add_transition(&stressed, &happy, EVENT_GOT_HAPPY, &on_trans_stressed_to_happy);
-//  fsm.add_transition(&stressed, &paranoid, EVENT_GOT_PARANOID, &on_trans_stressed_to_paranoid);
-//  fsm.add_transition(&paranoid, &happy, EVENT_GOT_HAPPY, NULL);
+  fsm.add_transition(&stressed, &happy, EVENT_GOT_HAPPY, &on_trans_stressed_to_happy);
+  fsm.add_transition(&stressed, &paranoid, EVENT_GOT_PARANOID, &on_trans_stressed_to_paranoid);
+  fsm.add_transition(&paranoid, &happy, EVENT_GOT_HAPPY, NULL);
 }
 
 
